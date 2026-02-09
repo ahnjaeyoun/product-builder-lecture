@@ -1,14 +1,180 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portfolio - [Your Name]</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <header>
+        <nav>
+            <div class="logo">[Your Name]</div>
+            <ul>
+                <li><a href="#about">About Me</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#education">Education</a></li>
+                <li><a href="#projects">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Hello, I'm [Your Name]</h1>
+                <p>A passionate developer focused on building scalable and efficient applications.</p>
+                <a href="#projects" class="btn">View My Work</a>
+            </div>
+        </section>
+
+        <section id="about" class="container">
+            <h2>About Me</h2>
+            <p>
+                I am a software engineer with X years of experience in [Your Primary Tech/Domain].
+                My journey in technology began with a fascination for problem-solving and creating innovative solutions.
+                I thrive in environments that challenge me to learn and grow, constantly seeking to
+                improve my skills and contribute to impactful projects. I specialize in [Key Skill 1],
+                [Key Skill 2], and have a strong understanding of [Key Concept/Area].
+                When I'm not coding, you can find me [Your Hobby/Interest].
+            </p>
+        </section>
+
+        <section id="skills" class="container">
+            <h2>Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Languages</h3>
+                    <ul>
+                        <li>JavaScript (ES6+)</li>
+                        <li>Python</li>
+                        <li>TypeScript</li>
+                        <li>Go</li>
+                        <li>C++</li>
+                    </ul>
+                </div>
+                <div class="skill-category">
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li>HTML5</li>
+                        <li>CSS3</li>
+                        <li>React</li>
+                        <li>Vue.js</li>
+                        <li>Webpack/Vite</li>
+                    </ul>
+                </div>
+                <div class="skill-category">
+                    <h3>Backend</h3>
+                    <ul>
+                        <li>Node.js (Express)</li>
+                        <li>Django/Flask</li>
+                        <li>FastAPI</li>
+                        <li>RESTful APIs</li>
+                        <li>GraphQL</li>
+                    </ul>
+                </div>
+                <div class="skill-category">
+                    <h3>Databases</h3>
+                    <ul>
+                        <li>PostgreSQL</li>
+                        <li>MongoDB</li>
+                        <li>MySQL</li>
+                        <li>Redis</li>
+                    </ul>
+                </div>
+                <div class="skill-category">
+                    <h3>Tools & Platforms</h3>
+                    <ul>
+                        <li>Git/GitHub</li>
+                        <li>Docker</li>
+                        <li>Kubernetes</li>
+                        <li>AWS/GCP/Azure</li>
+                        <li>Jira/Trello</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="container">
+            <h2>Experience</h2>
+            <div class="job-entry">
+                <h3>Software Engineer - Tech Solutions Inc.</h3>
+                <p class="job-meta">Jan 2022 - Present | City, State</p>
+                <ul>
+                    <li>Developed and maintained full-stack applications using React, Node.js, and PostgreSQL, improving system efficiency by 15%.</li>
+                    <li>Led the integration of a new payment gateway, reducing processing time by 20% and enhancing user experience.</li>
+                    <li>Collaborated with cross-functional teams to define, design, and ship new features for the flagship product.</li>
+                </ul>
+            </div>
+            <div class="job-entry">
+                <h3>Junior Developer - Web Innovations LLC</h3>
+                <p class="job-meta">Jun 2020 - Dec 2021 | City, State</p>
+                <ul>
+                    <li>Assisted in the development of responsive web interfaces using HTML, CSS, and JavaScript.</li>
+                    <li>Contributed to backend API development with Python and Flask, handling data serialization and database interactions.</li>
+                    <li>Participated in code reviews and adopted best practices for maintainable and scalable code.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="education" class="container">
+            <h2>Education</h2>
+            <div class="education-entry">
+                <h3>Bachelor of Science in Computer Science</h3>
+                <p>University of Technology | Graduated: May 2020</p>
+                <p>Relevant Coursework: Data Structures, Algorithms, Database Systems, Web Development, Software Engineering</p>
+            </div>
+            <div class="education-entry">
+                <h3>[Optional] Certification/Bootcamp Name</h3>
+                <p>[Provider Name] | Completed: [Date]</p>
+                <p>Focus: [e.g., Full-Stack Web Development, Cloud Engineering]</p>
+            </div>
+        </section>
+
+        <section id="projects" class="container">
+            <h2>Projects</h2>
+            <div class="project-grid">
+                <div class="project-card">
+                    <h3>Project Alpha</h3>
+                    <p class="project-description">A real-time chat application built with WebSockets, Node.js, and React. Features include user authentication, private messaging, and group chats.</p>
+                    <p class="project-tech"><span>Technologies:</span> React, Node.js, Express, Socket.IO, MongoDB</p>
+                    <div class="project-links">
+                        <a href="#" target="_blank" class="btn small-btn">Live Demo</a>
+                        <a href="#" target="_blank" class="btn small-btn">GitHub Repo</a>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Project Beta</h3>
+                    <p class="project-description">An e-commerce platform API developed using Python, FastAPI, and PostgreSQL. Implements secure authentication, product management, and order processing.</p>
+                    <p class="project-tech"><span>Technologies:</span> Python, FastAPI, PostgreSQL, SQLAlchemy, JWT</p>
+                    <div class="project-links">
+                        <a href="#" target="_blank" class="btn small-btn">Live Demo</a>
+                        <a href="#" target="_blank" class="btn small-btn">GitHub Repo</a>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Project Gamma</h3>
+                    <p class="project-description">A personal blog application with a custom CMS, built with Vue.js and a serverless backend on AWS Lambda and DynamoDB.</p>
+                    <p class="project-tech"><span>Technologies:</span> Vue.js, AWS Lambda, DynamoDB, API Gateway</p>
+                    <div class="project-links">
+                        <a href="#" target="_blank" class="btn small-btn">Live Demo</a>
+                        <a href="#" target="_blank" class="btn small-btn">GitHub Repo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 [Your Name]. All rights reserved.</p>
+        <div class="social-links">
+            <a href="#" target="_blank">GitHub</a>
+            <a href="#" target="_blank">LinkedIn</a>
+            <a href="#" target="_blank">Twitter</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
