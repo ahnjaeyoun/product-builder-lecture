@@ -245,49 +245,61 @@ const emotionMenuMap = {
   }
 };
 
-let faceModel, webcam, faceAnimationId;
+let faceModel, webcam, webcamLoopId;
 
-async function initFaceModel() {
-  const startBtn = document.getElementById("face-start-btn");
+// 1단계: 카메라 시작
+async function startCamera() {
+  var startBtn = document.getElementById("face-start-btn");
   startBtn.disabled = true;
   startBtn.textContent = "로딩 중...";
 
   try {
-    const modelURL = FACE_MODEL_URL + "model.json";
-    const metadataURL = FACE_MODEL_URL + "metadata.json";
+    var modelURL = FACE_MODEL_URL + "model.json";
+    var metadataURL = FACE_MODEL_URL + "metadata.json";
     faceModel = await tmImage.load(modelURL, metadataURL);
 
-    const flip = true;
-    webcam = new tmImage.Webcam(200, 200, flip);
+    webcam = new tmImage.Webcam(200, 200, true);
     await webcam.setup();
     await webcam.play();
 
     document.getElementById("webcam-container").appendChild(webcam.canvas);
     document.getElementById("face-before-start").style.display = "none";
-    document.getElementById("face-active").style.display = "block";
+    document.getElementById("face-webcam-phase").style.display = "block";
 
-    faceAnimationId = window.requestAnimationFrame(faceLoop);
+    webcamLoopId = window.requestAnimationFrame(updateWebcam);
   } catch (e) {
     startBtn.disabled = false;
     startBtn.textContent = "📷 카메라 시작하기";
-    document.getElementById("detected-emotion").textContent = "카메라를 사용할 수 없습니다";
+    alert("카메라를 사용할 수 없습니다.");
   }
 }
 
-let lastTopClass = "";
-
-async function faceLoop() {
+function updateWebcam() {
   webcam.update();
-  await facePrediction();
-  faceAnimationId = window.requestAnimationFrame(faceLoop);
+  webcamLoopId = window.requestAnimationFrame(updateWebcam);
 }
 
-async function facePrediction() {
+// 2단계: 촬영 & 분석
+async function captureAndAnalyze() {
+  var captureBtn = document.getElementById("face-capture-btn");
+  captureBtn.disabled = true;
+  captureBtn.textContent = "분석 중...";
+
+  webcam.update();
+
+  // 스냅샷 저장
+  var snapshot = document.getElementById("face-snapshot");
+  var ctx = snapshot.getContext("2d");
+  ctx.drawImage(webcam.canvas, 0, 0, 200, 200);
+
+  // 모델 예측
   var prediction = await faceModel.predict(webcam.canvas);
 
-  var barsEl = document.getElementById("face-bars");
-  barsEl.innerHTML = "";
+  // 웹캠 정지
+  window.cancelAnimationFrame(webcamLoopId);
+  webcam.stop();
 
+  // 결과 찾기
   var topClass = "";
   var topProb = 0;
   for (var i = 0; i < prediction.length; i++) {
@@ -295,6 +307,12 @@ async function facePrediction() {
       topProb = prediction[i].probability;
       topClass = prediction[i].className;
     }
+  }
+
+  // 확률 바 표시
+  var barsEl = document.getElementById("face-bars");
+  barsEl.innerHTML = "";
+  for (var i = 0; i < prediction.length; i++) {
     var row = document.createElement("div");
     row.className = "face-bar-row";
     row.innerHTML =
@@ -305,28 +323,49 @@ async function facePrediction() {
     barsEl.appendChild(row);
   }
 
+  // 표정 & 메뉴 추천
   var emotionInfo = emotionMenuMap[topClass];
-  if (emotionInfo && topProb > 0.5) {
-    var emotionEl = document.getElementById("detected-emotion");
+  var emotionEl = document.getElementById("detected-emotion");
+  if (emotionInfo) {
     emotionEl.innerHTML = emotionInfo.emoji + " <strong>" + topClass + "</strong>";
-
-    if (topClass !== lastTopClass) {
-      lastTopClass = topClass;
-      var menuName = emotionInfo.menus[Math.floor(Math.random() * emotionInfo.menus.length)];
-      var menuItem = menuData.find(function(m) { return m.name === menuName; });
-      var recEl = document.getElementById("face-recommend");
-      recEl.style.display = "block";
-      document.getElementById("face-rec-menu").textContent = (menuItem ? menuItem.emoji + " " : "") + menuName;
-      document.getElementById("face-rec-desc").textContent = emotionInfo.message;
-    }
+    var menuName = emotionInfo.menus[Math.floor(Math.random() * emotionInfo.menus.length)];
+    var menuItem = menuData.find(function(m) { return m.name === menuName; });
+    document.getElementById("face-rec-menu").textContent = (menuItem ? menuItem.emoji + " " : "") + menuName;
+    document.getElementById("face-rec-desc").textContent = emotionInfo.message;
   } else {
-    document.getElementById("detected-emotion").textContent = "표정을 분석하고 있어요...";
-    document.getElementById("face-recommend").style.display = "none";
-    lastTopClass = "";
+    emotionEl.innerHTML = "🤔 <strong>표정을 인식하지 못했어요</strong>";
+    var randomMenu = menuData[Math.floor(Math.random() * menuData.length)];
+    document.getElementById("face-rec-menu").textContent = randomMenu.emoji + " " + randomMenu.name;
+    document.getElementById("face-rec-desc").textContent = "대신 랜덤으로 하나 골라봤어요!";
   }
+
+  // 화면 전환: 웹캠 → 결과
+  document.getElementById("face-webcam-phase").style.display = "none";
+  document.getElementById("face-result-phase").style.display = "block";
 }
 
-document.getElementById("face-start-btn").addEventListener("click", initFaceModel);
+// 3단계: 다시 찍기
+async function retryCapture() {
+  document.getElementById("face-result-phase").style.display = "none";
+  document.getElementById("face-webcam-phase").style.display = "block";
+
+  var captureBtn = document.getElementById("face-capture-btn");
+  captureBtn.disabled = false;
+  captureBtn.textContent = "📸 촬영하기";
+
+  // 웹캠 컨테이너 초기화 후 재시작
+  var container = document.getElementById("webcam-container");
+  container.innerHTML = "";
+  webcam = new tmImage.Webcam(200, 200, true);
+  await webcam.setup();
+  await webcam.play();
+  container.appendChild(webcam.canvas);
+  webcamLoopId = window.requestAnimationFrame(updateWebcam);
+}
+
+document.getElementById("face-start-btn").addEventListener("click", startCamera);
+document.getElementById("face-capture-btn").addEventListener("click", captureAndAnalyze);
+document.getElementById("face-retry-btn").addEventListener("click", retryCapture);
 
 // 이벤트 바인딩
 recommendBtn.addEventListener("click", runSlotMachine);

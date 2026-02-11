@@ -390,7 +390,9 @@
             margin-top: 4px;
         }
 
-        #face-start-btn {
+        #face-start-btn,
+        #face-capture-btn,
+        #face-retry-btn {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
             color: #333;
             border: none;
@@ -403,14 +405,27 @@
             box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
         }
 
-        #face-start-btn:hover {
+        #face-start-btn:hover,
+        #face-capture-btn:hover,
+        #face-retry-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
         }
 
-        #face-start-btn:disabled {
+        #face-start-btn:disabled,
+        #face-capture-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        #face-capture-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        #face-capture-btn:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
         }
 
         .face-bars {
@@ -622,25 +637,32 @@
 
         <div class="face-banner" id="face-banner">
             <h2>📸 표정으로 메뉴 추천받기</h2>
-            <p style="color:var(--text-secondary); margin-bottom:15px; font-size:0.95rem;">카메라로 표정을 인식해서 딱 맞는 메뉴를 추천해드려요!</p>
+            <p style="color:var(--text-secondary); margin-bottom:15px; font-size:0.95rem;">카메라로 표정을 찍으면 딱 맞는 메뉴를 추천해드려요!</p>
             <div id="face-before-start">
                 <button id="face-start-btn">📷 카메라 시작하기</button>
             </div>
-            <div id="face-active" style="display:none;">
+            <div id="face-webcam-phase" style="display:none;">
+                <div class="webcam-wrapper" style="margin:0 auto 15px;">
+                    <div id="webcam-container"></div>
+                </div>
+                <button id="face-capture-btn">📸 촬영하기</button>
+            </div>
+            <div id="face-result-phase" style="display:none;">
                 <div class="face-banner-content">
                     <div class="webcam-wrapper">
-                        <div id="webcam-container"></div>
+                        <canvas id="face-snapshot" width="200" height="200"></canvas>
                     </div>
                     <div class="face-result">
-                        <div class="detected-emotion" id="detected-emotion">분석 중...</div>
+                        <div class="detected-emotion" id="detected-emotion"></div>
                         <div class="face-bars" id="face-bars"></div>
-                        <div class="face-recommend" id="face-recommend" style="display:none;">
+                        <div class="face-recommend" id="face-recommend">
                             <div class="rec-label">당신에게 추천하는 메뉴</div>
                             <div class="rec-menu" id="face-rec-menu"></div>
                             <div class="rec-desc" id="face-rec-desc"></div>
                         </div>
                     </div>
                 </div>
+                <button id="face-retry-btn" style="margin-top:18px;">🔄 다시 찍기</button>
             </div>
         </div>
 
