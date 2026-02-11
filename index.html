@@ -307,6 +307,78 @@
             text-align: center;
         }
 
+        .contact-section {
+            max-width: 500px;
+            margin: 20px auto 40px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 12px var(--card-shadow);
+            transition: background 0.3s;
+        }
+
+        .contact-section h2 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .contact-section .form-group {
+            margin-bottom: 14px;
+        }
+
+        .contact-section label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .contact-section input,
+        .contact-section textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--filter-border);
+            border-radius: 10px;
+            background: var(--slot-bg);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .contact-section input:focus,
+        .contact-section textarea:focus {
+            outline: none;
+            border-color: var(--card-cat-color);
+        }
+
+        .contact-section textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .contact-section button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 6px;
+        }
+
+        .contact-section button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
         @media (max-width: 600px) {
             header h1 {
                 font-size: 1.8rem;
@@ -364,6 +436,29 @@
 
         <h2 class="section-title" id="menu-section-title">전체 메뉴</h2>
         <div class="menu-grid" id="menu-grid"></div>
+
+        <div class="contact-section">
+            <h2>📩 제휴 문의</h2>
+            <form action="https://formspree.io/f/xlgwdjbg" method="POST">
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="company">회사/단체명 (선택)</label>
+                    <input type="text" id="company" name="company" placeholder="회사 또는 단체명">
+                </div>
+                <div class="form-group">
+                    <label for="message">문의 내용</label>
+                    <textarea id="message" name="message" placeholder="문의 내용을 입력하세요" required></textarea>
+                </div>
+                <button type="submit">문의 보내기</button>
+            </form>
+        </div>
     </div>
 
     <script src="main.js"></script>
