@@ -5,6 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오늘 저녁 뭐 먹지?</title>
     <style>
+        :root {
+            --bg-gradient-1: #667eea;
+            --bg-gradient-2: #764ba2;
+            --card-bg: #fff;
+            --card-shadow: rgba(0,0,0,0.08);
+            --card-hover-shadow: rgba(0,0,0,0.12);
+            --text-primary: #333;
+            --text-secondary: #777;
+            --text-desc: #888;
+            --slot-bg: #fff;
+            --slot-shadow: rgba(0,0,0,0.15);
+            --slot-cat-bg: #f0f0f0;
+            --slot-cat-color: #666;
+            --card-cat-bg: #f5f0ff;
+            --card-cat-color: #764ba2;
+            --filter-bg: rgba(255,255,255,0.2);
+            --filter-border: rgba(255,255,255,0.3);
+            --filter-hover: rgba(255,255,255,0.35);
+            --filter-active-bg: #fff;
+            --filter-active-color: #764ba2;
+            --toggle-bg: rgba(255,255,255,0.2);
+            --toggle-border: rgba(255,255,255,0.3);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --card-bg: #2a2a3e;
+            --card-shadow: rgba(0,0,0,0.3);
+            --card-hover-shadow: rgba(0,0,0,0.5);
+            --text-primary: #e8e8e8;
+            --text-secondary: #aaa;
+            --text-desc: #999;
+            --slot-bg: #2a2a3e;
+            --slot-shadow: rgba(0,0,0,0.4);
+            --slot-cat-bg: #3a3a50;
+            --slot-cat-color: #ccc;
+            --card-cat-bg: #3a2a5e;
+            --card-cat-color: #c8a8ff;
+            --filter-bg: rgba(255,255,255,0.08);
+            --filter-border: rgba(255,255,255,0.15);
+            --filter-hover: rgba(255,255,255,0.15);
+            --filter-active-bg: rgba(255,255,255,0.2);
+            --filter-active-color: #c8a8ff;
+            --toggle-bg: rgba(255,255,255,0.1);
+            --toggle-border: rgba(255,255,255,0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,9 +61,10 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            transition: background 0.3s;
         }
 
         .container {
@@ -75,11 +124,11 @@
 
         .slot-machine {
             margin: 25px auto;
-            background: #fff;
+            background: var(--slot-bg);
             border-radius: 20px;
             padding: 30px;
             max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px var(--slot-shadow);
             display: none;
         }
 
@@ -110,12 +159,12 @@
 
         .slot-display .menu-name {
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .slot-result-desc {
             text-align: center;
-            color: #777;
+            color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 5px;
         }
@@ -127,8 +176,8 @@
 
         .slot-result-category span {
             display: inline-block;
-            background: #f0f0f0;
-            color: #666;
+            background: var(--slot-cat-bg);
+            color: var(--slot-cat-color);
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.85rem;
@@ -153,9 +202,9 @@
         }
 
         .category-btn {
-            background: rgba(255,255,255,0.2);
+            background: var(--filter-bg);
             color: #fff;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid var(--filter-border);
             padding: 10px 20px;
             border-radius: 25px;
             cursor: pointer;
@@ -165,13 +214,13 @@
         }
 
         .category-btn:hover {
-            background: rgba(255,255,255,0.35);
+            background: var(--filter-hover);
         }
 
         .category-btn.active {
-            background: #fff;
-            color: #764ba2;
-            border-color: #fff;
+            background: var(--filter-active-bg);
+            color: var(--filter-active-color);
+            border-color: var(--filter-active-bg);
             font-weight: bold;
         }
 
@@ -184,17 +233,17 @@
         }
 
         .menu-card {
-            background: #fff;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
             cursor: default;
         }
 
         .menu-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px var(--card-hover-shadow);
         }
 
         .menu-card .card-emoji {
@@ -205,25 +254,50 @@
         .menu-card .card-name {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 6px;
         }
 
         .menu-card .card-desc {
             font-size: 0.9rem;
-            color: #888;
+            color: var(--text-desc);
             line-height: 1.4;
         }
 
         .menu-card .card-category {
             display: inline-block;
             margin-top: 10px;
-            background: #f5f0ff;
-            color: #764ba2;
+            background: var(--card-cat-bg);
+            color: var(--card-cat-color);
             padding: 3px 10px;
             border-radius: 10px;
             font-size: 0.8rem;
             font-weight: 500;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--toggle-bg);
+            border: 2px solid var(--toggle-border);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--filter-hover);
         }
 
         .section-title {
@@ -267,6 +341,7 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">🌙</button>
     <div class="container">
         <header>
             <h1>🍽️ 오늘 저녁 뭐 먹지?</h1>

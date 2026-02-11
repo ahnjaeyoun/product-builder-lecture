@@ -195,9 +195,30 @@ function runSlotMachine() {
   spin();
 }
 
+// 다크/라이트 모드 토글
+const themeToggle = document.getElementById("theme-toggle");
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved) return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  localStorage.setItem("theme", theme);
+}
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
 // 이벤트 바인딩
 recommendBtn.addEventListener("click", runSlotMachine);
 
 // 초기 렌더링
+applyTheme(getPreferredTheme());
 renderCategoryButtons();
 renderMenuGrid();
