@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오늘 저녁 뭐 먹지?</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <style>
         :root {
             --bg-gradient-1: #667eea;
@@ -307,6 +309,173 @@
             text-align: center;
         }
 
+        .face-banner {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px var(--card-shadow);
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .face-banner h2 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .face-banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .webcam-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--card-cat-color);
+            flex-shrink: 0;
+        }
+
+        .webcam-wrapper canvas {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .face-result {
+            text-align: left;
+            min-width: 220px;
+        }
+
+        .face-result .detected-emotion {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .face-result .detected-emotion strong {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .face-result .face-recommend {
+            background: var(--card-cat-bg);
+            border-radius: 14px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .face-result .face-recommend .rec-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .face-result .face-recommend .rec-menu {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .face-result .face-recommend .rec-desc {
+            font-size: 0.85rem;
+            color: var(--text-desc);
+            margin-top: 4px;
+        }
+
+        #face-start-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #333;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+        }
+
+        #face-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+        }
+
+        #face-start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .face-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 12px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .face-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .face-bar-row .bar-label {
+            width: 80px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .face-bar-row .bar-track {
+            flex: 1;
+            height: 8px;
+            background: var(--slot-cat-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .face-bar-row .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.2s;
+        }
+
+        @media (max-width: 600px) {
+            .face-banner-content {
+                flex-direction: column;
+            }
+
+            .webcam-wrapper {
+                width: 160px;
+                height: 160px;
+            }
+
+            .webcam-wrapper canvas {
+                width: 160px;
+                height: 160px;
+            }
+
+            .face-result {
+                text-align: center;
+                min-width: unset;
+            }
+
+            .face-bars {
+                margin: 12px auto 0;
+            }
+        }
+
         .disqus-section {
             max-width: 800px;
             margin: 20px auto;
@@ -450,6 +619,30 @@
         </div>
 
         <div class="category-filter" id="category-filter"></div>
+
+        <div class="face-banner" id="face-banner">
+            <h2>📸 표정으로 메뉴 추천받기</h2>
+            <p style="color:var(--text-secondary); margin-bottom:15px; font-size:0.95rem;">카메라로 표정을 인식해서 딱 맞는 메뉴를 추천해드려요!</p>
+            <div id="face-before-start">
+                <button id="face-start-btn">📷 카메라 시작하기</button>
+            </div>
+            <div id="face-active" style="display:none;">
+                <div class="face-banner-content">
+                    <div class="webcam-wrapper">
+                        <div id="webcam-container"></div>
+                    </div>
+                    <div class="face-result">
+                        <div class="detected-emotion" id="detected-emotion">분석 중...</div>
+                        <div class="face-bars" id="face-bars"></div>
+                        <div class="face-recommend" id="face-recommend" style="display:none;">
+                            <div class="rec-label">당신에게 추천하는 메뉴</div>
+                            <div class="rec-menu" id="face-rec-menu"></div>
+                            <div class="rec-desc" id="face-rec-desc"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <h2 class="section-title" id="menu-section-title">전체 메뉴</h2>
         <div class="menu-grid" id="menu-grid"></div>

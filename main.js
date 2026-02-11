@@ -215,6 +215,119 @@ themeToggle.addEventListener("click", () => {
   applyTheme(current === "dark" ? "light" : "dark");
 });
 
+// 표정 인식 메뉴 추천
+const FACE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Snrs8KzSEx/";
+const emotionMenuMap = {
+  "행복한 사람": {
+    emoji: "😊",
+    message: "기분 좋은 날엔 맛있는 걸로!",
+    menus: ["삼겹살", "치킨", "초밥", "파스타", "피자"]
+  },
+  "우울한 사람": {
+    emoji: "😢",
+    message: "위로가 필요할 땐 따뜻한 한 끼",
+    menus: ["김치찌개", "된장찌개", "칼국수", "설렁탕", "라멘"]
+  },
+  "피곤한 사람": {
+    emoji: "😴",
+    message: "에너지 충전이 필요해요!",
+    menus: ["갈비탕", "삼겹살", "스테이크", "폭립", "감자탕"]
+  },
+  "화난 사람": {
+    emoji: "😤",
+    message: "스트레스는 매운맛으로 날려버려!",
+    menus: ["떡볶이", "닭발", "제육볶음", "짬뽕", "낙지볶음"]
+  },
+  "무표정한 사람": {
+    emoji: "😐",
+    message: "새로운 맛에 도전해보세요!",
+    menus: ["오코노미야키", "감바스", "타코", "양장피", "뇨끼"]
+  }
+};
+
+let faceModel, webcam, faceAnimationId;
+
+async function initFaceModel() {
+  const startBtn = document.getElementById("face-start-btn");
+  startBtn.disabled = true;
+  startBtn.textContent = "로딩 중...";
+
+  try {
+    const modelURL = FACE_MODEL_URL + "model.json";
+    const metadataURL = FACE_MODEL_URL + "metadata.json";
+    faceModel = await tmImage.load(modelURL, metadataURL);
+
+    const flip = true;
+    webcam = new tmImage.Webcam(200, 200, flip);
+    await webcam.setup();
+    await webcam.play();
+
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+    document.getElementById("face-before-start").style.display = "none";
+    document.getElementById("face-active").style.display = "block";
+
+    faceAnimationId = window.requestAnimationFrame(faceLoop);
+  } catch (e) {
+    startBtn.disabled = false;
+    startBtn.textContent = "📷 카메라 시작하기";
+    document.getElementById("detected-emotion").textContent = "카메라를 사용할 수 없습니다";
+  }
+}
+
+let lastTopClass = "";
+
+async function faceLoop() {
+  webcam.update();
+  await facePrediction();
+  faceAnimationId = window.requestAnimationFrame(faceLoop);
+}
+
+async function facePrediction() {
+  var prediction = await faceModel.predict(webcam.canvas);
+
+  var barsEl = document.getElementById("face-bars");
+  barsEl.innerHTML = "";
+
+  var topClass = "";
+  var topProb = 0;
+  for (var i = 0; i < prediction.length; i++) {
+    if (prediction[i].probability > topProb) {
+      topProb = prediction[i].probability;
+      topClass = prediction[i].className;
+    }
+    var row = document.createElement("div");
+    row.className = "face-bar-row";
+    row.innerHTML =
+      '<span class="bar-label">' + prediction[i].className + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' +
+      (prediction[i].probability * 100).toFixed(0) + '%"></div></div>' +
+      '<span>' + (prediction[i].probability * 100).toFixed(0) + '%</span>';
+    barsEl.appendChild(row);
+  }
+
+  var emotionInfo = emotionMenuMap[topClass];
+  if (emotionInfo && topProb > 0.5) {
+    var emotionEl = document.getElementById("detected-emotion");
+    emotionEl.innerHTML = emotionInfo.emoji + " <strong>" + topClass + "</strong>";
+
+    if (topClass !== lastTopClass) {
+      lastTopClass = topClass;
+      var menuName = emotionInfo.menus[Math.floor(Math.random() * emotionInfo.menus.length)];
+      var menuItem = menuData.find(function(m) { return m.name === menuName; });
+      var recEl = document.getElementById("face-recommend");
+      recEl.style.display = "block";
+      document.getElementById("face-rec-menu").textContent = (menuItem ? menuItem.emoji + " " : "") + menuName;
+      document.getElementById("face-rec-desc").textContent = emotionInfo.message;
+    }
+  } else {
+    document.getElementById("detected-emotion").textContent = "표정을 분석하고 있어요...";
+    document.getElementById("face-recommend").style.display = "none";
+    lastTopClass = "";
+  }
+}
+
+document.getElementById("face-start-btn").addEventListener("click", initFaceModel);
+
 // 이벤트 바인딩
 recommendBtn.addEventListener("click", runSlotMachine);
 
