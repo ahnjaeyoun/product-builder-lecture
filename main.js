@@ -247,59 +247,33 @@ const emotionMenuMap = {
 
 let faceModel, webcam, webcamLoopId;
 
-// 1단계: 카메라 시작
-async function startCamera() {
-  var startBtn = document.getElementById("face-start-btn");
-  startBtn.disabled = true;
-  startBtn.textContent = "로딩 중...";
+async function loadModelIfNeeded() {
+  if (faceModel) return;
+  var modelURL = FACE_MODEL_URL + "model.json";
+  var metadataURL = FACE_MODEL_URL + "metadata.json";
+  faceModel = await tmImage.load(modelURL, metadataURL);
+}
 
-  try {
-    var modelURL = FACE_MODEL_URL + "model.json";
-    var metadataURL = FACE_MODEL_URL + "metadata.json";
-    faceModel = await tmImage.load(modelURL, metadataURL);
-
-    webcam = new tmImage.Webcam(200, 200, true);
-    await webcam.setup();
-    await webcam.play();
-
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
-    document.getElementById("face-before-start").style.display = "none";
-    document.getElementById("face-webcam-phase").style.display = "block";
-
-    webcamLoopId = window.requestAnimationFrame(updateWebcam);
-  } catch (e) {
-    startBtn.disabled = false;
-    startBtn.textContent = "📷 카메라 시작하기";
-    alert("카메라를 사용할 수 없습니다.");
+function stopWebcam() {
+  if (webcamLoopId) {
+    window.cancelAnimationFrame(webcamLoopId);
+    webcamLoopId = null;
   }
+  if (webcam) {
+    webcam.stop();
+    webcam = null;
+  }
+  document.getElementById("webcam-container").innerHTML = "";
 }
 
-function updateWebcam() {
-  webcam.update();
-  webcamLoopId = window.requestAnimationFrame(updateWebcam);
+function showPhase(phase) {
+  document.getElementById("face-before-start").style.display = phase === "start" ? "block" : "none";
+  document.getElementById("face-webcam-phase").style.display = phase === "webcam" ? "block" : "none";
+  document.getElementById("face-result-phase").style.display = phase === "result" ? "block" : "none";
 }
 
-// 2단계: 촬영 & 분석
-async function captureAndAnalyze() {
-  var captureBtn = document.getElementById("face-capture-btn");
-  captureBtn.disabled = true;
-  captureBtn.textContent = "분석 중...";
-
-  webcam.update();
-
-  // 스냅샷 저장
-  var snapshot = document.getElementById("face-snapshot");
-  var ctx = snapshot.getContext("2d");
-  ctx.drawImage(webcam.canvas, 0, 0, 200, 200);
-
-  // 모델 예측
-  var prediction = await faceModel.predict(webcam.canvas);
-
-  // 웹캠 정지
-  window.cancelAnimationFrame(webcamLoopId);
-  webcam.stop();
-
-  // 결과 찾기
+// 결과 표시 공통 함수
+function showResult(prediction) {
   var topClass = "";
   var topProb = 0;
   for (var i = 0; i < prediction.length; i++) {
@@ -309,7 +283,6 @@ async function captureAndAnalyze() {
     }
   }
 
-  // 확률 바 표시
   var barsEl = document.getElementById("face-bars");
   barsEl.innerHTML = "";
   for (var i = 0; i < prediction.length; i++) {
@@ -323,7 +296,6 @@ async function captureAndAnalyze() {
     barsEl.appendChild(row);
   }
 
-  // 표정 & 메뉴 추천
   var emotionInfo = emotionMenuMap[topClass];
   var emotionEl = document.getElementById("detected-emotion");
   if (emotionInfo) {
@@ -339,33 +311,120 @@ async function captureAndAnalyze() {
     document.getElementById("face-rec-desc").textContent = "대신 랜덤으로 하나 골라봤어요!";
   }
 
-  // 화면 전환: 웹캠 → 결과
-  document.getElementById("face-webcam-phase").style.display = "none";
-  document.getElementById("face-result-phase").style.display = "block";
+  showPhase("result");
 }
 
-// 3단계: 다시 찍기
-async function retryCapture() {
-  document.getElementById("face-result-phase").style.display = "none";
-  document.getElementById("face-webcam-phase").style.display = "block";
+// 카메라 시작
+async function startCamera() {
+  var startBtn = document.getElementById("face-start-btn");
+  startBtn.disabled = true;
+  startBtn.textContent = "로딩 중...";
 
+  try {
+    await loadModelIfNeeded();
+
+    webcam = new tmImage.Webcam(200, 200, true);
+    await webcam.setup();
+    await webcam.play();
+
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+    showPhase("webcam");
+
+    var captureBtn = document.getElementById("face-capture-btn");
+    captureBtn.disabled = false;
+    captureBtn.textContent = "📸 촬영하기";
+
+    function updateLoop() {
+      webcam.update();
+      webcamLoopId = window.requestAnimationFrame(updateLoop);
+    }
+    webcamLoopId = window.requestAnimationFrame(updateLoop);
+  } catch (e) {
+    alert("카메라를 사용할 수 없습니다.");
+  }
+  startBtn.disabled = false;
+  startBtn.textContent = "📷 카메라 시작하기";
+}
+
+// 촬영 & 분석
+async function captureAndAnalyze() {
   var captureBtn = document.getElementById("face-capture-btn");
-  captureBtn.disabled = false;
-  captureBtn.textContent = "📸 촬영하기";
+  captureBtn.disabled = true;
+  captureBtn.textContent = "분석 중...";
 
-  // 웹캠 컨테이너 초기화 후 재시작
-  var container = document.getElementById("webcam-container");
-  container.innerHTML = "";
-  webcam = new tmImage.Webcam(200, 200, true);
-  await webcam.setup();
-  await webcam.play();
-  container.appendChild(webcam.canvas);
-  webcamLoopId = window.requestAnimationFrame(updateWebcam);
+  webcam.update();
+
+  var snapshot = document.getElementById("face-snapshot");
+  var ctx = snapshot.getContext("2d");
+  ctx.drawImage(webcam.canvas, 0, 0, 200, 200);
+
+  var prediction = await faceModel.predict(webcam.canvas);
+
+  stopWebcam();
+  showResult(prediction);
+}
+
+// 취소하기 (웹캠 → 초기 화면)
+function cancelCamera() {
+  stopWebcam();
+  showPhase("start");
+}
+
+// 다시 촬영하기 (결과 → 웹캠)
+async function retryCapture() {
+  showPhase("start");
+  await startCamera();
+}
+
+// 처음으로 (결과 → 초기 화면)
+function backToStart() {
+  showPhase("start");
+}
+
+// 이미지 업로드 분석
+async function handleImageUpload(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+
+  var startBtn = document.getElementById("face-start-btn");
+  startBtn.disabled = true;
+  startBtn.textContent = "분석 중...";
+
+  try {
+    await loadModelIfNeeded();
+
+    var img = new Image();
+    img.onload = async function() {
+      var snapshot = document.getElementById("face-snapshot");
+      var ctx = snapshot.getContext("2d");
+      // 이미지를 정사각형 중앙 크롭하여 그리기
+      var size = Math.min(img.width, img.height);
+      var sx = (img.width - size) / 2;
+      var sy = (img.height - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
+
+      var prediction = await faceModel.predict(snapshot);
+      showResult(prediction);
+
+      startBtn.disabled = false;
+      startBtn.textContent = "📷 카메라 시작하기";
+    };
+    img.src = URL.createObjectURL(file);
+  } catch (err) {
+    alert("이미지를 분석할 수 없습니다.");
+    startBtn.disabled = false;
+    startBtn.textContent = "📷 카메라 시작하기";
+  }
+  // 같은 파일 재선택 가능하도록 초기화
+  e.target.value = "";
 }
 
 document.getElementById("face-start-btn").addEventListener("click", startCamera);
 document.getElementById("face-capture-btn").addEventListener("click", captureAndAnalyze);
+document.getElementById("face-cancel-btn").addEventListener("click", cancelCamera);
 document.getElementById("face-retry-btn").addEventListener("click", retryCapture);
+document.getElementById("face-back-btn").addEventListener("click", backToStart);
+document.getElementById("face-upload-input").addEventListener("change", handleImageUpload);
 
 // 이벤트 바인딩
 recommendBtn.addEventListener("click", runSlotMachine);
