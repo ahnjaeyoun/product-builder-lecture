@@ -804,6 +804,38 @@
                 font-size: 0.85rem;
             }
         }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s, transform 0.2s;
+        }
+
+        .scroll-top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -987,6 +1019,22 @@
         <p>&copy; 2025 오늘 저녁 뭐 먹지? All rights reserved.</p>
     </footer>
 
+    <button class="scroll-top-btn" id="scroll-top-btn" aria-label="맨 위로">↑</button>
+    <script>
+        (function() {
+            var btn = document.getElementById('scroll-top-btn');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            });
+            btn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        })();
+    </script>
     <script src="main.js"></script>
 </body>
 </html>
