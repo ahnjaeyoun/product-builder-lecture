@@ -301,6 +301,23 @@
             font-weight: 500;
         }
 
+        .logo-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            z-index: 100;
+            transition: opacity 0.2s;
+        }
+
+        .logo-link:hover {
+            opacity: 0.8;
+        }
+
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -790,6 +807,7 @@
     </style>
 </head>
 <body>
+    <a href="https://jaeyounportpolio.pages.dev/" class="logo-link" target="_blank" rel="noopener noreferrer">AJY.</a>
     <button class="theme-toggle" id="theme-toggle" aria-label="테마 전환">🌙</button>
     <div class="container">
         <header>
