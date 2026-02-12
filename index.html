@@ -348,7 +348,23 @@
             justify-content: center;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            padding: 12px 20px;
+            margin: 0 -20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        nav.sticky {
+            background: rgba(102, 126, 234, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="dark"] nav.sticky {
+            background: rgba(26, 26, 46, 0.9);
         }
 
         nav a {
@@ -1023,11 +1039,17 @@
     <script>
         (function() {
             var btn = document.getElementById('scroll-top-btn');
+            var nav = document.querySelector('nav');
             window.addEventListener('scroll', function() {
                 if (window.scrollY > 300) {
                     btn.classList.add('visible');
                 } else {
                     btn.classList.remove('visible');
+                }
+                if (nav.getBoundingClientRect().top <= 0) {
+                    nav.classList.add('sticky');
+                } else {
+                    nav.classList.remove('sticky');
                 }
             });
             btn.addEventListener('click', function() {
