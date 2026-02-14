@@ -329,51 +329,62 @@
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-            padding-bottom: 40px;
+            gap: 12px;
+            margin-top: 16px;
+            padding-bottom: 30px;
         }
 
         .menu-card {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--card-shadow);
+            border-radius: 14px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 8px var(--card-shadow);
             transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
             cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
         .menu-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px var(--card-hover-shadow);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--card-hover-shadow);
         }
 
         .menu-card .card-emoji {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .menu-card .card-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .menu-card .card-name {
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             font-weight: bold;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 3px;
         }
 
         .menu-card .card-desc {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             color: var(--text-desc);
             line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .menu-card .card-category {
             display: inline-block;
-            margin-top: 10px;
+            margin-top: 5px;
             background: var(--card-cat-bg);
             color: var(--card-cat-color);
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.72rem;
             font-weight: 500;
         }
 
@@ -558,8 +569,8 @@
         .face-banner {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
             box-shadow: 0 4px 12px var(--card-shadow);
             text-align: center;
             transition: background 0.3s;
@@ -567,8 +578,8 @@
 
         .face-banner h2 {
             color: var(--text-primary);
-            font-size: 1.4rem;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
         }
 
         .face-banner-content {
@@ -967,7 +978,7 @@
 
         <section class="face-banner" id="face-banner" aria-label="표정 인식 메뉴 추천">
             <h2>📸 표정으로 메뉴 추천받기</h2>
-            <p style="color:var(--text-secondary); margin-bottom:15px; font-size:0.95rem;">카메라로 표정을 찍거나 이미지를 업로드하면 딱 맞는 메뉴를 추천해드려요!</p>
+            <p style="color:var(--text-secondary); margin-bottom:10px; font-size:0.9rem;">카메라로 표정을 찍거나 이미지를 업로드하면 딱 맞는 메뉴를 추천해드려요!</p>
             <div id="face-before-start">
                 <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                     <button class="face-btn" id="face-start-btn">📷 카메라 시작하기</button>

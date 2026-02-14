@@ -143,9 +143,11 @@ function renderMenuGrid() {
     card.className = "menu-card";
     card.innerHTML =
       '<div class="card-emoji">' + item.emoji + '</div>' +
-      '<div class="card-name">' + item.name + '</div>' +
-      '<div class="card-desc">' + item.desc + '</div>' +
-      '<span class="card-category">' + item.category + '</span>';
+      '<div class="card-info">' +
+        '<div class="card-name">' + item.name + '</div>' +
+        '<div class="card-desc">' + item.desc + '</div>' +
+        '<span class="card-category">' + item.category + '</span>' +
+      '</div>';
     menuGrid.appendChild(card);
   });
 }
